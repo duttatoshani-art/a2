@@ -1,42 +1,282 @@
-<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>Responsive Music Player</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <div class="player-container">
-    <div class="album-art">
-      <img src="image/image22.png" alt="music note" />
-    </div>
-
-    <div class="icons-row">
-      <i class="fa-regular fa-heart" id="likeBtn"></i>
-      <i class="fa-solid fa-headphones"></i>
-      <i class="fa-solid fa-ellipsis-vertical"></i>
-    </div>
-
-    <div class="progress-bar">
-      <input type="range" id="progress" value="0" />
-      <div class="time">
-        <span id="currentTime">0:00</span>
-        <span id="duration">0:00</span>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <style>
+    .dropdown-enter { opacity: 0; transform: scale(0.95); pointer-events: none;}
+    .dropdown-show { opacity: 1; transform: scale(1); pointer-events:auto;}
+  </style>
+ </head>
+ <body class="bg-[#6e5e6e] flex items-center justify-center min-h-screen">
+  <div class="bg-[#2f2a2f] rounded-xl w-64 sm:w-72 md:w-80 p-4 flex flex-col items-center shadow-lg">
+   <div class="bg-[#7a8a8a] rounded-lg w-full aspect-square flex items-center justify-center mb-4 relative overflow-hidden">
+    <img
+      alt="Blurred background with white music note icon in center"
+      class="w-24 h-24 object-contain"
+      height="256"
+      src="https://storage.googleapis.com/a1aa/image/51c01475-a63a-473e-3a0f-913595d3c23f.jpg"
+      width="256"
+      id="cover-image"
+    />
+   </div>
+   <div class="w-full flex justify-between items-center mb-1 px-1">
+    <!-- Heart Button -->
+    <button
+      aria-label="Like"
+      class="text-white text-lg transition"
+      id="heart-btn"
+    >
+     <i class="far fa-heart"></i>
+    </button>
+    <!-- Headphone Option Responsive -->
+    <button
+      aria-label="Headphones"
+      class="text-white text-lg transition relative group"
+      id="headphone-btn"
+    >
+     <i class="fas fa-headphones"></i>
+     <span class="hidden group-hover:flex absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-white text-xs rounded px-2 py-1 z-10 pointer-events-none">
+        Headphones Mode
+      </span>
+    </button>
+    <!-- 3 Dots Dropdown Option -->
+    <div class="relative inline-block text-left">
+      <button
+        aria-label="More options"
+        class="text-white text-lg"
+        id="dots-btn"
+        type="button"
+      >
+        <i class="fas fa-ellipsis-v"></i>
+      </button>
+      <div
+        id="dropdown-menu"
+        class="dropdown-enter transition-all duration-100 absolute right-0 mt-2 w-32 rounded bg-gray-800 shadow-lg z-20"
+        style="display:none;"
+      >
+        <button
+          class="text-white text-sm px-4 py-2 block w-full text-left hover:bg-gray-700"
+          id="download-btn"
+        >
+          <i class="fas fa-download mr-2"></i>Download
+        </button>
       </div>
     </div>
-
-    <div class="controls">
-      <i class="fa-solid fa-backward-step"></i>
-      <i class="fa-solid fa-play" id="playBtn"></i>
-      <i class="fa-solid fa-forward-step"></i>
-      <i class="fa-solid fa-shuffle"></i>
-    </div>
-
-    <audio id="audio-player" src="image/SoundHelix-Song-1.mp3"></audio>
+   </div>
+   <input aria-label="Music progress slider" class="w-full mb-1 accent-white" max="100" min="0" type="range" value="0" id="progress-bar"/>
+   <div class="w-full flex justify-between text-xs text-white px-1 mb-3 select-none">
+    <span id="current-time">0:00</span>
+    <span id="duration">0:00</span>
+   </div>
+   <div class="w-full flex justify-between text-white text-xl px-2">
+    <button aria-label="Previous" class="hover:text-gray-300" id="prev-btn">
+     <i class="fas fa-backward"></i>
+    </button>
+    <button aria-label="Play" class="hover:text-gray-300" id="play-btn">
+     <i class="fas fa-pause"></i>
+    </button>
+    <button aria-label="Next" class="hover:text-gray-300" id="next-btn">
+     <i class="fas fa-forward"></i>
+    </button>
+    <button aria-label="Shuffle" class="hover:text-gray-300" id="shuffle-btn">
+     <i class="fas fa-random"></i>
+    </button>
+   </div>
+   <!-- Hidden Audio Element -->
+   <audio id="audio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
   </div>
+  <script>
+    // Song List (Feel free to add more)
+    const songs = [
+      {
+        title: 'SoundHelix Song 1',
+        src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+        cover: 'https://storage.googleapis.com/a1aa/image/51c01475-a63a-473e-3a0f-913595d3c23f.jpg'
+      },
+      {
+        title: 'SoundHelix Song 2',
+        src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+        cover: 'https://cdn.pixabay.com/photo/2016/11/22/19/14/blur-1853262_1280.jpg'
+      },
+      {
+        title: 'SoundHelix Song 3',
+        src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+        cover: 'https://cdn.pixabay.com/photo/2017/01/20/00/30/milky-way-1995079_1280.jpg'
+      }
+    ];
 
-  <script src="script.js"></script>
-</body>
+    let currentSongIndex = 0;
+    let isPlaying = true;
+    let isHearted = false;
+    let isShuffle = false;
+
+    const audio = document.getElementById('audio');
+    const heartBtn = document.getElementById('heart-btn');
+    const headphoneBtn = document.getElementById('headphone-btn');
+    const dotsBtn = document.getElementById('dots-btn');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+    const downloadBtn = document.getElementById('download-btn');
+    const playBtn = document.getElementById('play-btn');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const shuffleBtn = document.getElementById('shuffle-btn');
+    const progressBar = document.getElementById('progress-bar');
+    const currentTimeSpan = document.getElementById('current-time');
+    const durationSpan = document.getElementById('duration');
+    const coverImage = document.getElementById('cover-image');
+    
+    // Load song by index
+    function loadSong(index, autoPlay=true) {
+      const {src, cover} = songs[index];
+      audio.src = src;
+      coverImage.src = cover;
+      audio.load();
+      if (autoPlay) {
+        audio.play();
+        isPlaying = true;
+        updatePlayPause();
+      }
+    }
+    // Format time (in seconds) as mm:ss
+    function formatTime(secs) {
+      if (isNaN(secs)) return "0:00";
+      let m = Math.floor(secs / 60);
+      let s = Math.floor(secs % 60);
+      return m + ":" + (s < 10 ? "0"+s : s);
+    }
+    // Play/pause button state
+    function updatePlayPause() {
+      playBtn.innerHTML = isPlaying
+        ? '<i class="fas fa-pause"></i>'
+        : '<i class="fas fa-play"></i>';
+    }
+    // Like Button
+    heartBtn.addEventListener('click', function(){
+      isHearted = !isHearted;
+      heartBtn.innerHTML = isHearted
+        ? '<i class="fas fa-heart" style="color:#27fa70"></i>'
+        : '<i class="far fa-heart"></i>';
+    });
+    // Headphone Button: Responsive Popover on hover and focus
+    headphoneBtn.addEventListener('focus', () => {
+      headphoneBtn.querySelector('span').classList.remove('hidden');
+    });
+    headphoneBtn.addEventListener('blur', () => {
+      headphoneBtn.querySelector('span').classList.add('hidden');
+    });
+    // Touch support
+    headphoneBtn.addEventListener('touchstart', function(e){
+      // show tip for headphones mode, closes on blur
+      headphoneBtn.querySelector('span').classList.remove('hidden');
+    });
+    headphoneBtn.addEventListener('touchend', function(e){
+      setTimeout(()=>headphoneBtn.querySelector('span').classList.add('hidden'), 800);
+    });
+
+    // 3 Dots Dropdown
+    dotsBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdownMenu.style.display = (dropdownMenu.style.display === "none" || dropdownMenu.style.display === "") ? "block" : "none";
+      setTimeout(()=>{
+        dropdownMenu.classList.toggle('dropdown-show');
+      }, 2);
+    });
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!dropdownMenu.contains(e.target) && !dotsBtn.contains(e.target)) {
+        dropdownMenu.classList.remove('dropdown-show');
+        setTimeout(()=> {
+          dropdownMenu.style.display = "none";
+        }, 100);
+      }
+    });
+    // Download Option
+    downloadBtn.addEventListener('click', function(){
+      const link = document.createElement('a');
+      link.href = songs[currentSongIndex].src;
+      link.download = songs[currentSongIndex].title + '.mp3';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      dropdownMenu.classList.remove('dropdown-show');
+      setTimeout(()=> dropdownMenu.style.display="none",100)
+    });
+    // Play/Pause
+    playBtn.addEventListener('click', function(){
+      if (audio.paused) {
+        audio.play();
+        isPlaying = true;
+      } else {
+        audio.pause();
+        isPlaying = false;
+      }
+      updatePlayPause();
+    });
+    audio.addEventListener('play', ()=> {
+      isPlaying = true; updatePlayPause();
+    });
+    audio.addEventListener('pause', ()=> {
+      isPlaying = false; updatePlayPause();
+    });
+    // Previous song
+    prevBtn.addEventListener('click', function(){
+      if (audio.currentTime > 2) {
+        // Restart song if more than 2s in
+        audio.currentTime = 0;
+      } else {
+        currentSongIndex = (currentSongIndex + songs.length - 1) % songs.length;
+        loadSong(currentSongIndex, true);
+      }
+    });
+    // Next song
+    nextBtn.addEventListener('click', function(){
+      if (isShuffle) {
+        let old = currentSongIndex;
+        do {
+          currentSongIndex = Math.floor(Math.random() * songs.length);
+        } while (songs.length > 1 && currentSongIndex === old);
+      } else {
+        currentSongIndex = (currentSongIndex + 1) % songs.length;
+      }
+      loadSong(currentSongIndex, true);
+    });
+    // Shuffle
+    shuffleBtn.addEventListener('click', function() {
+      isShuffle = !isShuffle;
+      shuffleBtn.classList.toggle('text-green-400', isShuffle);
+    });
+    // Update Progress Bar & Time
+    audio.addEventListener('timeupdate', function(){
+      progressBar.max = audio.duration || 100;
+      progressBar.value = audio.currentTime;
+      currentTimeSpan.textContent = formatTime(audio.currentTime);
+      durationSpan.textContent = formatTime(audio.duration);
+    });
+    // When song ends
+    audio.addEventListener('ended', function(){
+      nextBtn.click();
+    });
+    // Seek music
+    progressBar.addEventListener('input', function(){
+      audio.currentTime = progressBar.value;
+    });
+    // Update on load
+    audio.addEventListener('loadedmetadata', function(){
+      durationSpan.textContent = formatTime(audio.duration);
+      progressBar.max = audio.duration;
+      progressBar.value = 0;
+      currentTimeSpan.textContent = formatTime(0);
+    });
+
+    // Loads first song and auto plays it
+    window.addEventListener('DOMContentLoaded', function(){
+      loadSong(currentSongIndex);
+      isPlaying = true;
+      updatePlayPause();
+    });
+  </script>
+ </body>
 </html>
