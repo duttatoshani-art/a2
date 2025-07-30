@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Responsive Music Player</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="player-container">
+    <div class="album-art">
+      <img src="image/image22.png" alt="music note" />
+    </div>
+
+    <div class="icons-row">
+      <i class="fa-regular fa-heart" id="likeBtn"></i>
+      <i class="fa-solid fa-headphones"></i>
+      <i class="fa-solid fa-ellipsis-vertical"></i>
+    </div>
+
+    <div class="progress-bar">
+      <input type="range" id="progress" value="0" />
+      <div class="time">
+        <span id="currentTime">0:00</span>
+        <span id="duration">0:00</span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <i class="fa-solid fa-backward-step"></i>
+      <i class="fa-solid fa-play" id="playBtn"></i>
+      <i class="fa-solid fa-forward-step"></i>
+      <i class="fa-solid fa-shuffle"></i>
+    </div>
+
+    <audio id="audio-player" src="image/SoundHelix-Song-1.mp3"></audio>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
